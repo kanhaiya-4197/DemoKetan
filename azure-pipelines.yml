@@ -10,10 +10,28 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'Eversana Sonacloud'
+    organization: 'eversana'
+    scannerMode: 'Other'
+
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
     goals: 'clean install'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    javaHomeOption: 'JDKVersion'
+    mavenVersionOption: 'Default'
+    mavenAuthenticateFeed: false
+    effectivePomSkip: false
+    sonarQubeRunAnalysis: true
+    sqMavenPluginVersionChoice: 'latest'
+
+- task: SonarCloudPublish@1
+  inputs:
+    pollingTimeoutSec: '300'
 
 - task: CopyFiles@2
   inputs:
